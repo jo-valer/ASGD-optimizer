@@ -4,11 +4,39 @@ I found that PyTorch ASGD behaves differently than SGD before the averaging star
 
 In ASGD, the point at which to start averaging is a hyper-parameter. For this reason I also implemented the Non-monotonically Triggered ASGD proposed by [Merity et al., 2017](https://arxiv.org/abs/1708.02182). This method triggers the averaging when the validation loss does not decrease for a certain number of epochs, avoiding the need to set a fixed averaging starting point.
 
-### Pytorch ASGD (green) vs SGD (purple)
+**Pytorch ASGD (green) vs SGD (purple):**
 <br><img src="https://github.com/jo-valer/ASGD-optimizer/blob/main/img/pytorch_asgd.png" width="60%" height="60%"><br>
 
-### My ASGD (green) vs SGD (red)
+**My ASGD (green) vs SGD (red):**
 <br><img src="https://github.com/jo-valer/ASGD-optimizer/blob/main/img/my_asgd.png" width="60%" height="60%"><br>
+
+## Usage
+The code can be downloaded and used as a module. The optimizers can be imported as follows:
+```python
+from asgd import ASGD
+from ntasgd import NTASGD
+```
+
+### Averaged SGD
+The ASGD optimizer can be used as any other PyTorch optimizer. The following example shows how to initialize it, with a given PyTorch model:
+```python
+optimizer = ASGD(model.parameters(), lr=0.1, t0=100)
+```
+The parameter `t0` is the number of epochs before starting the averaging.
+
+### Non-monotonically Triggered ASGD
+The NTASGD optimizer can be used as follows:
+```python
+optimizer = NTASGD(model, dev_loader, train_loader, train_batch_size, criterion_eval, eval_fn, lr=0.1)
+```
+Note that the NTASGD optimizer requires the model, **not the parameters**, and the following additional parameters:
+- `dev_loader`: the PyTorch DataLoader for the validation set.
+- `train_loader`: the PyTorch DataLoader for the training set.
+- `train_batch_size`: the batch size used for training.
+- `criterion_eval`: the loss function used for evaluation.
+- `eval_fn`: the evaluation function used for evaluation.
+
+This because the averaging is triggered by the validation loss, not by a fixed number of epochs.
 
 ## Implementation details
 - For now, the averaging is applied to the first parameter group only.
