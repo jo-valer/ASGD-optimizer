@@ -1,8 +1,6 @@
-import torch
-import warnings
+from typing import Optional
 
-# Disable warnings
-warnings.filterwarnings("ignore")
+import torch
 
 class ASGD(torch.optim.SGD):
     """
@@ -13,10 +11,19 @@ class ASGD(torch.optim.SGD):
             self,
             params,
             lr: float = 1.0,
-            t0: int = 1
+            t0: int = 1,
+            momentum: float = 0,
+            dampening: float = 0,
+            weight_decay: float = 0,
+            nesterov=False,
+            *,
+            maximize: bool = False,
+            foreach: Optional[bool] = None,
+            differentiable: bool = False,
+            fused: Optional[bool] = None
             ):
 
-        super(ASGD, self).__init__(params, lr=lr)
+        super(ASGD, self).__init__(params, lr, momentum, dampening, weight_decay, nesterov, maximize=maximize, foreach=foreach, differentiable=differentiable, fused=fused)
         self.t0 = t0
         self.t = 0
         self.ax = {} # To store the average of the parameters

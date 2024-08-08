@@ -1,9 +1,7 @@
-import torch
-import math
-import warnings
+from typing import Optional
+from math import ceil
 
-# Disable warnings
-warnings.filterwarnings("ignore")
+import torch
 
 class NTASGD(torch.optim.SGD):
     """
@@ -12,20 +10,29 @@ class NTASGD(torch.optim.SGD):
 
     def __init__(
             self,
-            model,
-            dev_loader,
-            train_loader,
-            train_batch_size,
-            criterion_eval,
-            eval_fn,
+            model: torch.nn.Module,
+            dev_loader: torch.utils.data.DataLoader,
+            train_loader: torch.utils.data.DataLoader,
+            train_batch_size: int,
+            criterion_eval: callable,
+            eval_fn: callable,
             lr: float = 1.0,
-            non_monotone_interval: int = 5
+            non_monotone_interval: int = 5,
+            momentum: float = 0,
+            dampening: float = 0,
+            weight_decay: float = 0,
+            nesterov=False,
+            *,
+            maximize: bool = False,
+            foreach: Optional[bool] = None,
+            differentiable: bool = False,
+            fused: Optional[bool] = None
             ):
 
-        super(NTASGD, self).__init__(model.parameters(), lr=lr)
+        super(NTASGD, self).__init__(model.parameters(), lr, momentum, dampening, weight_decay, nesterov, maximize=maximize, foreach=foreach, differentiable=differentiable, fused=fused)
         self.t0 = 0
         self.model = model
-        self.logging_interval = math.ceil(len(train_loader.dataset)/train_batch_size)
+        self.logging_interval = ceil(len(train_loader.dataset)/train_batch_size)
         self.non_monotone_interval = non_monotone_interval
         self.t = 0
         self.k = 0
