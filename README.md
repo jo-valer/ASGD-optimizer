@@ -40,4 +40,5 @@ This because the averaging is triggered by the validation loss, not by a fixed n
 
 ## Implementation details
 - For now, the averaging is applied to the first parameter group only.
+- The NTASGD optimizer expects the `eval_fn` to take `dev_loader`, `criterion_eval`, and `model` as input; and return the validation metric. Thus it assumes this metric has to be minimized. If you use a metric that has to be maximized, you can multiply it by -1.
 
