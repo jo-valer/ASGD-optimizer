@@ -51,7 +51,7 @@ class NTASGD(torch.optim.SGD):
             if self.k % self.logging_interval == 0 and self.t0 == 0: # if mod(k, L) = 0 and T = 0.
                 validation = self.eval_fn(self.dev_loader, self.criterion_eval, self.model) # Compute validation metric v
                 self.model.train()
-                if self.t > self.non_monotone_interval and validation > min(self.logs[:self.t-self.non_monotone_interval]): # if t > n and v > min l∈{0,··· ,t−n−1}logs[l]
+                if self.t > self.non_monotone_interval and validation > min(self.logs[:self.t-self.non_monotone_interval]): # if t > n and v > min (l in {0,··· ,t−n−1}) logs[l]
                     self.t0 = self.k
                     print("Averaging triggered at t0 =", self.k)
                 self.logs.append(validation) # Append v to logs
