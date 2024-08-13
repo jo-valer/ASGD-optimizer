@@ -22,7 +22,21 @@ The ASGD optimizer can be used as any other PyTorch optimizer. The following exa
 ```python
 optimizer = ASGD(model.parameters(), lr=0.1, t0=100)
 ```
-The parameter `t0` is the number of epochs before starting the averaging.
+The parameter `t0` is the number of epochs before starting the averaging. The averaged parameters are not used for optimization, but only for evaluation. Therefore, the model should be evaluated using the averaged parameters, which can be set as follows:
+```python
+optimizer.average()
+```
+The model can be set back to the non-averaged parameters using:
+```python
+optimizer.revert()
+```
+
+For instance, if you have a validation set, you can evaluate the model during training as follows:
+```python
+optimizer.average()
+eval_fn(dev_loader, criterion_eval, model) # Your evaluation function
+optimizer.revert()
+```
 
 ### Non-monotonically Triggered ASGD
 The NTASGD optimizer can be used as follows:
@@ -37,6 +51,15 @@ Note that the NTASGD optimizer requires the model, **not the parameters**, and t
 - `eval_fn`: the evaluation function used for evaluation.
 
 This because the averaging is triggered by the validation loss, not by a fixed number of epochs.
+
+As for the ASGD optimizer, the averaged parameters can be set using:
+```python
+optimizer.average()
+```
+and reverted, if needed, using:
+```python
+optimizer.revert()
+```
 
 ## Implementation details
 - For now, the averaging is applied to the first parameter group only.
