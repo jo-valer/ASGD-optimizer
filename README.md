@@ -56,9 +56,9 @@ Note that the NTASGD optimizer requires the model, **not only its parameters**, 
 - `criterion_eval`: the loss function used for evaluation.
 - `eval_fn`: the evaluation function used for evaluation.
 
-⚠️ The NTASGD optimizer expects the `eval_fn` to take `dev_loader`, `criterion_eval`, and `model` as input; and return the validation metric. Thus it assumes this metric has to be minimized. If you use a metric that has to be maximized, you can multiply it by -1.
-
 This because the averaging is triggered by the validation loss, not by a fixed number of epochs.
+
+⚠️ The NTASGD optimizer expects the `eval_fn` to take `dev_loader`, `criterion_eval`, and `model` as input; and return the validation metric. Thus it assumes this metric has to be minimized. If you use a metric that has to be maximized, you can multiply it by -1.
 
 As for the ASGD optimizer, the averaged parameters can be set using:
 ```python
