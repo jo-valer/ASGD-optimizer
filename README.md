@@ -1,5 +1,11 @@
 # Averaged Stochastic Gradient Descent
+- [Motivation](#motivation)
+- [Usage](#usage)
+  - [Averaged SGD](#averaged-sgd)
+  - [Non-monotonically Triggered ASGD](#non-monotonically-triggered-asgd)
+- [Implementation details](#implementation-details)
 
+## Motivation
 I found that PyTorch ASGD behaves differently than SGD before the averaging starting point, even though it is not supposed to. In particular SGD converges more rapidly (see image below). For this reason, here is an implementation of ASGD that behaves like SGD before the averaging. The averaging technique has been proposed by [Polyak and Juditsky, 1992](https://dl.acm.org/doi/10.1137/0330046).
 
 In ASGD, the point at which to start averaging is a hyper-parameter. For this reason I also implemented the Non-monotonically Triggered ASGD proposed by [Merity et al., 2017](https://arxiv.org/abs/1708.02182). This method triggers the averaging when the validation loss does not decrease for a certain number of epochs, avoiding the need to set a fixed averaging starting point.
@@ -43,12 +49,14 @@ The NTASGD optimizer can be used as follows:
 ```python
 optimizer = NTASGD(model, dev_loader, train_loader, train_batch_size, criterion_eval, eval_fn, lr=0.1)
 ```
-Note that the NTASGD optimizer requires the model, **not the parameters**, and the following additional parameters:
+Note that the NTASGD optimizer requires the model, **not only its parameters**, and also:
 - `dev_loader`: the PyTorch DataLoader for the validation set.
 - `train_loader`: the PyTorch DataLoader for the training set.
 - `train_batch_size`: the batch size used for training.
 - `criterion_eval`: the loss function used for evaluation.
 - `eval_fn`: the evaluation function used for evaluation.
+
+⚠️ The NTASGD optimizer expects the `eval_fn` to take `dev_loader`, `criterion_eval`, and `model` as input; and return the validation metric. Thus it assumes this metric has to be minimized. If you use a metric that has to be maximized, you can multiply it by -1.
 
 This because the averaging is triggered by the validation loss, not by a fixed number of epochs.
 
@@ -63,5 +71,3 @@ optimizer.revert()
 
 ## Implementation details
 - For now, the averaging is applied to the first parameter group only.
-- The NTASGD optimizer expects the `eval_fn` to take `dev_loader`, `criterion_eval`, and `model` as input; and return the validation metric. Thus it assumes this metric has to be minimized. If you use a metric that has to be maximized, you can multiply it by -1.
-
